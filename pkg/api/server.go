@@ -33,9 +33,13 @@ func (api *TapAPIServer) Serve() {
 }
 
 func (api *TapAPIServer) getTaps(w http.ResponseWriter, r *http.Request) {
-	tap := service.NewTap()
-	tapList := [1]service.Tap{*tap}
+
+	tapList, err := api.svc.GetTaps()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tapList)
+	if err != nil {
+		json.NewEncoder(w).Encode(err)
+	} else {
+		json.NewEncoder(w).Encode(tapList)
+	}
 }

@@ -24,7 +24,7 @@ type TapList []Tap
 
 // TapServicer is the service interface for the Taps
 type TapServicer interface {
-	GetTaps() (TapList, error)
+	GetTaps() ([]Tap, error)
 }
 
 // TapService is the default implementation for the TapServicer interface
@@ -33,8 +33,10 @@ type TapService struct {
 
 // GetTaps returns the list of beers that are currently on tap or
 // an error if something unexpected occurred.
-func (svc *TapService) GetTaps() (TapList, error) {
-	return nil, nil
+func (svc *TapService) GetTaps() ([]Tap, error) {
+	tap := NewTap()
+	tapList := []Tap{*tap}
+	return tapList, nil
 }
 
 // NewTapService returns a new instance of the TapService
