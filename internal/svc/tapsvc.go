@@ -22,24 +22,52 @@ func NewTap() *Tap {
 // TapList is a list of taps
 type TapList []Tap
 
+// TapWriter writes the list of taps to something.
+type TapWriter interface {
+	Write([]Tap) error
+}
+
+// TapReader reads the list of taps
+type TapReader interface {
+	Read() ([]Tap, error)
+}
+
 // TapServicer is the service interface for the Taps
 type TapServicer interface {
-	GetTaps() ([]Tap, error)
+	FindAll() ([]Tap, error)
+	Save(Tap) (Tap, error)
 }
 
 // TapService is the default implementation for the TapServicer interface
 type TapService struct {
+	reader TapReader
+	writer TapWriter
 }
 
-// GetTaps returns the list of beers that are currently on tap or
+// FindAll returns the list of beers that are currently on tap or
 // an error if something unexpected occurred.
-func (svc *TapService) GetTaps() ([]Tap, error) {
-	tap := NewTap()
-	tapList := []Tap{*tap}
-	return tapList, nil
+func (svc *TapService) FindAll() ([]Tap, error) {
+	return svc.reader.Read()
+}
+
+// Save allows you to save a tap
+func (svc *TapService) Save(t Tap) (Tap, error) {
+	// Load the taps from the service
+	taps, err := svc.FindAll()
+	if err != nil {
+		return t, err
+	}
+	// Add the new tap
+	taps = append(taps, t)
+
+	err = svc.writer.Write(taps)
+	return t, err
 }
 
 // NewTapService returns a new instance of the TapService
-func NewTapService() TapServicer {
-	return &TapService{}
+func NewTapService(w TapWriter, r TapReader) TapServicer {
+	return &TapService{
+		writer: w,
+		reader: r,
+	}
 }
