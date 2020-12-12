@@ -1,0 +1,12 @@
+{
+    "id": "5",
+    "name": "Nate IPA",
+    "tag": "IPA",
+    "description": "A really nummy IPA that is so hoppy your face will blow up.",
+    "tapNumber": 1,
+    "originalGravity": 7.00,
+    "color": "Amber",
+    "ibu": 1700.0,
+    "calories": 300,
+    "abv": 17.8
+}

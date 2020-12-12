@@ -4,6 +4,8 @@
 ARG VARIANT="1"
 FROM mcr.microsoft.com/vscode/devcontainers/go:0-${VARIANT}
 
+EXPOSE 8080
+
 # [Option] Install Node.js
 ARG INSTALL_NODE="true"
 ARG NODE_VERSION="lts/*"

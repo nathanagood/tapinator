@@ -30,6 +30,7 @@ type YamlTapRepository struct {
 }
 
 func (r *YamlTapRepository) Write(taps []service.Tap) error {
+	log.Debug().Msgf("Saving tap now to file: %", r.filePath)
 	file, err := os.Create(r.filePath)
 
 	if err != nil {
@@ -43,12 +44,12 @@ func (r *YamlTapRepository) Write(taps []service.Tap) error {
 }
 
 func (r *YamlTapRepository) Read() ([]service.Tap, error) {
-	var tapList []service.Tap
+	tapList := []service.Tap{}
 	yamlFile, err := ioutil.ReadFile(r.filePath)
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
 	}
-	err = yaml.Unmarshal(yamlFile, tapList)
+	err = yaml.Unmarshal(yamlFile, &tapList)
 	return tapList, err
 }
 
@@ -97,10 +98,13 @@ func (api *TapAPIServer) saveTap(w http.ResponseWriter, r *http.Request) {
 	tap := service.NewTap()
 	err := json.NewDecoder(r.Body).Decode(tap)
 	if err != nil {
+		log.Err(err).Msg("Error while processing body")
 		json.NewEncoder(w).Encode(err)
 	} else {
+		log.Debug().Msgf("Found tap: %s", tap.Name)
 		result, err := api.svc.Save(*tap)
 		if err != nil {
+			log.Err(err).Msg("Error while saving taps")
 			json.NewEncoder(w).Encode(err)
 		} else {
 			json.NewEncoder(w).Encode(result)

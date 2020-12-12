@@ -1,5 +1,7 @@
 package svc
 
+import "github.com/rs/zerolog/log"
+
 // Tap is the representation of a beer on tap
 type Tap struct {
 	ID          string  `json:"id,omitempty"`
@@ -8,10 +10,10 @@ type Tap struct {
 	Description string  `json:"description"`
 	TapNumber   int     `json:"tapNumber"`
 	Gravity     float64 `json:"originalGravity"`
-	Color       float64 `json:"color"`
+	Color       string  `json:"color"`
 	IBUs        float64 `json:"ibu"`
 	Calories    int     `json:"calorires"`
-	ABV         int     `json:"abv"`
+	ABV         float64 `json:"abv"`
 }
 
 // NewTap creates a new instance of a Tap
@@ -54,11 +56,17 @@ func (svc *TapService) FindAll() ([]Tap, error) {
 func (svc *TapService) Save(t Tap) (Tap, error) {
 	// Load the taps from the service
 	taps, err := svc.FindAll()
+	log.Debug().Msgf("Found % taps", len(taps))
 	if err != nil {
 		return t, err
 	}
-	// Add the new tap
-	taps = append(taps, t)
+	if len(taps) == 0 {
+		log.Warn().Msg("Found no taps, creating new list")
+		taps = []Tap{t}
+	} else {
+		log.Debug().Msgf("Found %s taps, adding %", len(taps), t.Name)
+		taps = append(taps, t)
+	}
 
 	err = svc.writer.Write(taps)
 	return t, err
